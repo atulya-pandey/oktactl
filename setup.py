@@ -7,6 +7,7 @@ setup(name='oktactl',
       license='MIT',
       author='Atulya Kumar Pandey',
       author_email='atul3015@gmail.com',
+      url='https://github.com/atul3015kr/oktactl',
       packages=find_packages(),
       install_requires=[
           'Click',
