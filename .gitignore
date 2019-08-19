@@ -1,2 +1,5 @@
 venv
 .vscode
+oktactl.egg-info
+dist
+build
