@@ -89,8 +89,8 @@ def create_user(password, number, login, email, last_name, first_name):
         logging.exception("Exception occured: ", exc_info=exc)
 
 
-@okta.command('create-groups')
-def create_groups():
+@okta.command('create-groups-and-assign-to-app')
+def create_groups_and_assign_to_app():
     base_url, headers = get_api_info()
     group_url = "{}/groups".format(base_url)
     group_name_list = []
