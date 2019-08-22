@@ -12,6 +12,7 @@ from .utils import get_api_info
 def okta():
     pass
 
+
 @okta.command('configure')
 def configure():
     domain_name = click.prompt('Domain name')
@@ -24,6 +25,7 @@ def configure():
     f.write("domain_name: {0}\napi_token: {1}".format(domain_name, api_token))
     f.close()
 
+
 @okta.command('list-users')
 def list_users():
     base_url, headers = get_api_info()
@@ -32,12 +34,15 @@ def list_users():
     try:
         response = requests.get(url, headers=headers)
         for user in json.loads(response.text):
-            user_list.append("{} {}".format(user['profile']['firstName'], user['profile']['lastName']))
+            user_list.append("{} {}".format(
+                user['profile']['firstName'], user['profile']['lastName']))
         click.secho("User List: {}".format(user_list), fg='green')
     except ConnectionError:
-        click.secho("Invalid credentials provided. \nUse `okta configure` command to configure credentials", fg='red')
+        click.secho(
+            "Invalid credentials provided. \nUse `okta configure` command to configure credentials", fg='red')
     except Exception as exc:
         logging.info("Exception occured: ", exc_info=exc)
+
 
 @click.option('--password', prompt='User\'s password', help='User\'s password', hide_input=True)
 @click.option('--number', prompt='User\'s phone number', help='User\'s phone number')
@@ -70,13 +75,63 @@ def create_user(password, number, login, email, last_name, first_name):
         response = requests.post(url, data=data, headers=headers)
         if response.status_code == 200:
             user_details = json.loads(response.text)
-            click.secho("User created successfully with user-id: {}".format(user_details['id']), fg='green')
+            click.secho(
+                "User created successfully with user-id: {}".format(user_details['id']), fg='green')
         else:
             error_message = 'Error occured while creating user: \n'
             for message in json.loads(response._content)['errorCauses']:
                 error_message = error_message + message['errorSummary'] + '\n'
             click.secho("{}".format(error_message), fg='red')
     except ConnectionError:
-        click.secho("Invalid credentials provided. \n Use `okta configure` command to configure credentials", fg='red')
+        click.secho(
+            "Invalid credentials provided. \nUse `okta configure` command to configure credentials", fg='red')
     except Exception as exc:
         logging.exception("Exception occured: ", exc_info=exc)
+
+
+@okta.command('create-groups')
+def create_groups():
+    base_url, headers = get_api_info()
+    group_url = "{}/groups".format(base_url)
+    group_name_list = []
+    group_desc_list = []
+    successfully_created_groups = []
+    failed_groups = []
+    
+    while True:
+        group_name_list.append(click.prompt("Group name"))
+        group_desc_list.append(click.prompt("Group Desccription"))
+        if not click.confirm('Do you want create more groups?'):
+            break
+    
+    app_id = click.prompt("App id")
+
+    for group_name, group_desc in zip(group_name_list, group_desc_list):
+        group_data = json.dumps({
+            "profile": {
+                "name": group_name,
+                "description": group_desc
+            }
+        })
+        try:
+            group_response = requests.post(group_url, data=group_data, headers=headers)
+            if group_response.status_code == 200:
+                group_details = json.loads(group_response.text)
+                group_id = group_details['id']
+                successfully_created_groups.append(group_name)
+                
+                app_url = "{}/apps/{}/groups/{}".format(base_url, app_id, group_id)
+                app_response = requests.put(app_url, headers=headers)
+                if app_response.status_code == 200:
+                    click.secho(
+                        "Group '{}' created successfully and has been assigned to app {}".format(group_name, app_id), fg='green')
+            else:
+                failed_groups.append(group_name)
+        except ConnectionError:
+            click.secho(
+                "Invalid credentials provided. \nUse `okta configure` command to configure credentials", fg='red')
+    if successfully_created_groups:
+        click.secho("List of groups created successfully: {}".format(successfully_created_groups), fg='green')
+    if failed_groups:
+        click.secho("Failed to create these groups: {}".format(failed_groups), fg='red')
+

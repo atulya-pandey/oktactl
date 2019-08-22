@@ -3,3 +3,4 @@ venv
 oktactl.egg-info
 dist
 build
+oktactl/__pycache__/
