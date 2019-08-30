@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(name='oktactl',
-      version='0.0.7',
+      version='0.0.8',
       description='Sample Okta CLI tool in python',
       license='MIT',
       author='Atulya Kumar Pandey',
@@ -15,7 +15,7 @@ setup(name='oktactl',
       ],
       entry_points='''
             [console_scripts]
-            oktactl=oktactl.okta:okta
+            oktactl=oktactl.commands:okta
         ''',
       zip_safe=True,
       include_package_data=True,
