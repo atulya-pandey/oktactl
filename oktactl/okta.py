@@ -97,5 +97,5 @@ def create_groups_and_assign_to_app_dec():
         click.secho("\nList of groups created successfully: {}".format(
             successfully_created_groups), fg='green')
     if failed_groups:
-        click.secho("\nFailed to create these groups: {}".format(
-            failed_groups), fg='red')
+        click.secho("\nFailed to create these groups: {}.\nErrorSummary: {}".format(
+            failed_groups, json.loads(group_response._content)['errorCauses'][0]['errorSummary']), fg='red')
