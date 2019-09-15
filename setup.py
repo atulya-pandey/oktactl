@@ -11,7 +11,8 @@ setup(name='oktactl',
       packages=find_packages(),
       install_requires=[
           'Click',
-          'requests'
+          'requests',
+          'tqdm'
       ],
       entry_points='''
             [console_scripts]
