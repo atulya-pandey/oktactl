@@ -1,6 +1,6 @@
 import click
 import os
-from .okta import list_users_dec, create_groups_and_assign_to_app_dec, create_user_dec
+from .okta import list_users_dec, create_groups_and_assign_to_app_dec, create_user_dec, delete_groups_dec
 
 
 @click.group()
@@ -47,3 +47,8 @@ def create_user(password, number, login, email, last_name, first_name):
 @okta.command('create-groups-and-assign-to-app')
 def create_groups_and_assign_to_app():
     create_groups_and_assign_to_app_dec()
+
+
+@okta.command('delete-groups')
+def delete_groups():
+    delete_groups_dec()

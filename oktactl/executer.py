@@ -1,6 +1,7 @@
 import click
 import logging
 from requests.exceptions import ConnectionError
+import traceback
 
 
 def executer(func):
@@ -10,7 +11,7 @@ def executer(func):
         except ConnectionError:
             click.secho(
                 "Invalid credentials provided. \nUse `oktactl configure` command to configure credentials", fg='red')
-        except Exception as exc:
-            logging.info("Exception occured: ", exc_info=exc)
+        except Exception:
+            click.secho("Exception occured:\n {}".format(traceback.format_exc()), fg='red')
     
     return execute
