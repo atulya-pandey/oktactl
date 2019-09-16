@@ -11,6 +11,8 @@ def executer(func):
         except ConnectionError:
             click.secho(
                 "Invalid credentials provided. \nUse `oktactl configure` command to configure credentials", fg='red')
+        except FileNotFoundError:
+            click.secho("Incorrect file path provided", fg='red')
         except Exception:
             click.secho("Exception occured:\n {}".format(traceback.format_exc()), fg='red')
     

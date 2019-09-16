@@ -7,6 +7,7 @@ from .executer import executer
 import random
 import time
 from tqdm import tqdm
+import os
 
 
 @executer
@@ -81,13 +82,17 @@ def create_groups_and_assign_to_app_dec():
                 group_name_list.append("{}-{}".format(group_name, random.randint(1,1000001)))
                 group_desc_list.append(group_description)
     
+    else:
+        click.secho("Incorrect option selected", fg='red')
+        create_groups_and_assign_to_app_dec()
+    
     create_groups_and_assign_to_app_dec_utility(group_name_list, group_desc_list)
 
 def create_groups_and_assign_to_app_dec_utility(group_name_list, group_desc_list):
     base_url, headers = get_api_info()
     group_url = "{}/groups".format(base_url)
-    successfully_created_groups = []
-    failed_groups = []
+    successfully_created_groups = {}
+    failed_groups = {}
 
     app_id = click.prompt("App id")
 
@@ -105,7 +110,7 @@ def create_groups_and_assign_to_app_dec_utility(group_name_list, group_desc_list
         if group_response.status_code == 200:
             group_details = json.loads(group_response.text)
             group_id = group_details['id']
-            successfully_created_groups.append(group_name)
+            successfully_created_groups[group_name] = {'id': group_id, 'desc': group_desc}
             app_url = "{}/apps/{}/groups/{}".format(base_url, app_id, group_id)
             app_response = requests.put(app_url, headers=headers)
 
@@ -116,12 +121,23 @@ def create_groups_and_assign_to_app_dec_utility(group_name_list, group_desc_list
                 click.secho(
                     "Group '{}' created successfully and but couldn't be assigned to the app '{}'. ErrorSummary: {}".format(group_name, app_id, json.loads(app_response._content)['errorSummary']), fg='red') 
         else:
-            failed_groups.append(group_name)
+            failed_groups[group_name] = {'id': None, 'desc': group_desc}
     if successfully_created_groups:
         click.secho("\nList of groups created successfully: {}".format(
-            successfully_created_groups), fg='green')
+            [key for key in successfully_created_groups.keys()]), fg='green')
     if failed_groups:
-        click.secho("\nFailed to create these groups: {}.\n".format(failed_groups), fg='red')
+        click.secho("\nFailed to create these groups: {}.\n".format([key for key in failed_groups.keys()]), fg='red')
+    merged_dictionary = successfully_created_groups.copy()
+    merged_dictionary.update(failed_groups)
+
+    create_groups_and_assign_to_app_post_action(merged_dictionary)
+
+def create_groups_and_assign_to_app_post_action(group_details):
+    current_wd = os.getcwd()
+    with open('{}/group-details-post-actions.csv'.format(current_wd), mode='w') as file:
+        writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerows([group_name, group_details[group_name]['desc'], group_details[group_name]['id'],] for group_name in group_details)
+    click.secho("Logs generated: {}/group-details-post-actions.csv".format(current_wd))
 
 @executer
 def delete_groups_dec():
