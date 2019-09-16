@@ -134,10 +134,10 @@ def create_groups_and_assign_to_app_dec_utility(group_name_list, group_desc_list
 
 def create_groups_and_assign_to_app_post_action(group_details):
     current_wd = os.getcwd()
-    with open('{}/group-details-post-actions.csv'.format(current_wd), mode='w') as file:
+    with open('{}/group-details-log.csv'.format(current_wd), mode='w', newline='') as file:
         writer = csv.writer(file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         writer.writerows([group_name, group_details[group_name]['desc'], group_details[group_name]['id'],] for group_name in group_details)
-    click.secho("Logs generated: {}/group-details-post-actions.csv".format(current_wd))
+    click.secho("Log file generated: {}/group-details-log.csv".format(current_wd))
 
 @executer
 def delete_groups_dec():
