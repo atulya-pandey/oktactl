@@ -1,4 +1,4 @@
-### OKTA-CTL
+# OKTA-CTL
 
 ## Installation
 The easiest way to install `oktactl` is to use pip in a virtualenv:  
@@ -11,7 +11,7 @@ $ pip install oktactl
 ## Getting started
   
   
-Before using `oktactl`, you need to tell it about your okta credentials. You can do this in several ways:  
+Before using `oktactl`, you need to tell it about your okta credentials.   
     
 The quickest way to get started is to run the oktactl configure command:  
 ```
